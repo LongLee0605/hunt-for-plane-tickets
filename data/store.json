@@ -1,0 +1,11 @@
+{
+  "rules": [],
+  "deals": [],
+  "notifications": [],
+  "scanState": {
+    "lastScanAt": "2026-04-27T13:01:34.932Z",
+    "lastMatchedDealIds": [],
+    "matchedDealsCount": 0,
+    "scannedRulesCount": 0
+  }
+}

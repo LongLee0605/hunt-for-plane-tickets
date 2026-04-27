@@ -1,0 +1,16 @@
+import type { SourceResult } from "@/lib/sources/types";
+import { searchTravelpayoutsDeals } from "@/lib/travelpayouts";
+
+export async function fetchVjSourceDeals(from: string, to: string, dateFrom: string): Promise<SourceResult> {
+  const fromTravelpayouts = await searchTravelpayoutsDeals({
+    from,
+    to,
+    dateFrom,
+    airlineCode: "VJ",
+  });
+  if (fromTravelpayouts.length > 0) {
+    return { source: "travelpayouts", deals: fromTravelpayouts };
+  }
+
+  return { source: "none", deals: [] };
+}
