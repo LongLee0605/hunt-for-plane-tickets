@@ -58,16 +58,22 @@ export async function runScan() {
       }
     }
 
-    const inserted = await saveDeals(allDeals);
-    const matched = pickMatchedDeals(rule, inserted);
+    await saveDeals(allDeals);
+    // So khop gia tren toan bo ket qua vua fetch — khong chi deal "insert moi"
+    // (deal da ton tai trong DB van phai duoc tinh la phu hop de UI hien thi dung).
+    const matched = pickMatchedDeals(rule, allDeals);
     const freshMatched = matched.filter((deal) => !notifiedDealIds.has(deal.id));
     report.matchedDeals += freshMatched.length;
-    latestMatchedDealIds.push(...freshMatched.map((deal) => deal.id));
+    latestMatchedDealIds.push(...matched.map((deal) => deal.id));
 
-    const logs = await sendDealsEmail(rule, freshMatched);
-    report.sentEmails += logs.length > 0 ? 1 : 0;
-    logs.forEach((item) => notifiedDealIds.add(item.dealId));
-    await saveNotificationLogs(logs);
+    try {
+      const logs = await sendDealsEmail(rule, freshMatched);
+      report.sentEmails += logs.length > 0 ? 1 : 0;
+      logs.forEach((item) => notifiedDealIds.add(item.dealId));
+      await saveNotificationLogs(logs);
+    } catch (error) {
+      console.error("[scan] sendDealsEmail failed for rule", rule.id, error);
+    }
   }
 
   await updateScanState({

@@ -6,6 +6,7 @@ Ung dung theo doi gia ve voi frontend React/Vite/Tailwind va backend Express API
 
 - `src/client/*`: giao dien React + Tailwind.
 - `src/server/index.ts`: REST API (`/api/rules`, `/api/deals`, `/api/scan`, `/api/status`).
+- `GET /api/deals?scope=matching`: tat ca chuyen van con khop rule (tuyen, ngay, hang, gia tran).
 - `src/lib/*`: scanner, provider, notifier, D1 access.
 - `cloudflare/scan-trigger/*`: Cloudflare Worker cron trigger.
 
@@ -17,8 +18,10 @@ cp .env.example .env.local
 npm run dev
 ```
 
-- Frontend: `http://localhost:5173`
-- API: `http://localhost:8787`
+- Frontend: `http://localhost:5173` (hoac port khac neu 5173 da bi chiem; xem log Vite)
+- API: `http://localhost:8787` — **bat buoc** khi dung UI: `npm run dev` chay ca Vite va API; neu chi `npm run dev:web` thi `/api/*` se loi.
+
+Luu y: khoang ngay quet Travelpayouts duoc tinh theo lich **UTC** de tranh lech ngay o may timezone (VD Viet Nam).
 
 ## Build frontend
 
@@ -51,8 +54,10 @@ Worker se goi `POST /api/scan/cron` moi 10 phut.
 
 ## Bien moi truong
 
+- `DB_MODE`: `local` (dev) hoac `d1` (production).
 - `TRAVELPAYOUTS_BASE_URL`
 - `TRAVELPAYOUTS_TOKEN`
+- `TRAVELPAYOUTS_MAX_CALENDAR_MONTHS` (tu chon, mac dinh 12): gioi han so thang goi API calendar khi khoang ngay rule dai.
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_D1_DATABASE_ID`
@@ -62,3 +67,13 @@ Worker se goi `POST /api/scan/cron` moi 10 phut.
 - `CRON_SECRET`
 - `APP_BASE_URL`
 - `PORT` (mac dinh `8787`)
+
+## Che do DB
+
+- Local dev: de `DB_MODE=local`, du lieu luu trong `data/store.json`.
+- Production Cloudflare: de `DB_MODE=d1` va cung cap day du `CLOUDFLARE_*`.
+
+## Du lieu gia ve (Travelpayouts)
+
+- Ung dung lay gia theo **tung ngay trong thang** qua `/v1/prices/calendar`, moi ngay co mot muc gia kem ma hang `airline` — phu hop loc VN/VJ.
+- Endpoint `/v1/prices/cheap` chi tra **mot** muc re nhat cho ngay/tuyen; hang bay co the khong phai VN/VJ nen truoc day hay ra **0 chuyen**.

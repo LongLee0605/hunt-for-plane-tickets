@@ -1,0 +1,28 @@
+{
+  "rules": [
+    {
+      "id": "04ca782494be8c1cbcd00224",
+      "title": "Săn giá 2tr",
+      "active": true,
+      "departureCode": "BMV",
+      "arrivalCode": "SGN",
+      "maxPrice": 2000000,
+      "dateFrom": "2026-04-27",
+      "dateTo": "2026-05-31",
+      "airlines": [
+        "vietnamairlines",
+        "vietjet"
+      ],
+      "createdAt": "2026-04-27T17:20:36.652Z",
+      "updatedAt": "2026-04-27T17:20:36.652Z"
+    }
+  ],
+  "deals": [],
+  "notifications": [],
+  "scanState": {
+    "lastScanAt": "2026-04-27T17:26:59.231Z",
+    "lastMatchedDealIds": [],
+    "matchedDealsCount": 0,
+    "scannedRulesCount": 1
+  }
+}

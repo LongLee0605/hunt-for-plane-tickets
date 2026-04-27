@@ -14,6 +14,7 @@ type Rule = {
 
 type Deal = {
   id: string;
+  ruleId: string;
   airline: string;
   flightNumber: string;
   departureCode: string;
@@ -78,11 +79,24 @@ export default function App() {
   );
 
   async function loadData() {
-    const [rulesRes, dealsRes] = await Promise.all([fetch("/api/rules"), fetch("/api/deals?scope=latest")]);
-    const rulesJson = (await rulesRes.json()) as { rules: Rule[] };
-    const dealsJson = (await dealsRes.json()) as { deals: Deal[] };
-    setRules(rulesJson.rules ?? []);
-    setDeals(dealsJson.deals ?? []);
+    try {
+      const [rulesRes, dealsRes] = await Promise.all([fetch("/api/rules"), fetch("/api/deals?scope=matching")]);
+      if (!rulesRes.ok || !dealsRes.ok) {
+        const ruleErr = !rulesRes.ok ? await rulesRes.text() : "";
+        const dealErr = !dealsRes.ok ? await dealsRes.text() : "";
+        throw new Error(ruleErr || dealErr || "Không thể tải dữ liệu từ máy chủ.");
+      }
+
+      const rulesJson = (await rulesRes.json()) as { rules: Rule[] };
+      const dealsJson = (await dealsRes.json()) as { deals: Deal[] };
+      setRules(rulesJson.rules ?? []);
+      setDeals(dealsJson.deals ?? []);
+    } catch (error) {
+      setRules([]);
+      setDeals([]);
+      const message = error instanceof Error ? error.message : "Không thể tải dữ liệu từ máy chủ.";
+      setMessage(`Lỗi tải dữ liệu: ${message}`);
+    }
   }
 
   useEffect(() => {
@@ -131,7 +145,17 @@ export default function App() {
     setMessage("");
     try {
       const response = await fetch("/api/scan", { method: "POST" });
-      if (!response.ok) return setMessage("Chạy scan thất bại. Vui lòng thử lại sau.");
+      if (!response.ok) {
+        let detail = "";
+        try {
+          const err = (await response.json()) as { error?: string };
+          if (err.error) detail = ` (${err.error})`;
+        } catch {
+          detail = ` (HTTP ${response.status})`;
+        }
+        setMessage(`Chạy quét thất bại${detail}. Kiểm tra API đang chạy (npm run dev hoặc npm run dev:api trên cổng 8787).`);
+        return;
+      }
       const data = (await response.json()) as {
         result: { scannedRules: number; matchedDeals: number; sentEmails: number };
       };
@@ -140,7 +164,7 @@ export default function App() {
       );
       await loadData();
     } catch {
-      setMessage("Không thể kết nối máy chủ. Vui lòng thử lại.");
+      setMessage("Không thể kết nối máy chủ. Hãy chạy `npm run dev` (cả web + API) hoặc mở API tại http://localhost:8787.");
     } finally {
       setBusy(false);
     }
@@ -320,41 +344,55 @@ export default function App() {
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-lg font-semibold">Ưu đãi mới ({deals.length})</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-[980px] w-full text-left text-sm">
-            <thead className="bg-slate-100">
-              <tr>
-                <th className="px-3 py-2">Hãng</th>
-                <th className="px-3 py-2">Mã chuyến</th>
-                <th className="px-3 py-2">Tuyến bay</th>
-                <th className="px-3 py-2">Khởi hành</th>
-                <th className="px-3 py-2">Đến nơi</th>
-                <th className="px-3 py-2">Giá</th>
-                <th className="px-3 py-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {deals.map((deal) => (
-                <tr key={deal.id} className="border-b">
-                  <td className="px-3 py-2">{deal.airline.toUpperCase()}</td>
-                  <td className="px-3 py-2">{deal.flightNumber}</td>
-                  <td className="px-3 py-2">
-                    {getAirportLabel(deal.departureCode)} {"->"} {getAirportLabel(deal.arrivalCode)}
-                  </td>
-                  <td className="px-3 py-2">{formatDateTime(deal.departureTime)}</td>
-                  <td className="px-3 py-2">{formatDateTime(deal.arrivalTime)}</td>
-                  <td className="px-3 py-2">{formatPrice(deal.price, deal.currency)}</td>
-                  <td className="px-3 py-2">
-                    <a className="font-semibold text-blue-700" href={deal.deeplink} target="_blank" rel="noreferrer">
-                      Xem vé
-                    </a>
-                  </td>
+        <h2 className="mb-1 text-lg font-semibold">Chuyến bay phù hợp bộ lọc ({deals.length})</h2>
+        <p className="mb-3 text-sm text-slate-600">
+          Hiển thị mọi vé đã quét, còn khớp tuyến — ngày — hãng — giá trần của các bộ lọc đang bật (không chỉ lần quét cuối). Hãy bấm &quot;Quét ngay&quot; nếu chưa có dữ liệu.
+        </p>
+        {deals.length === 0 ? (
+          <p className="rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
+            Chưa có chuyến nào trong kho dữ liệu khớp bộ lọc. Thử tăng giá trần, nới khoảng ngày, hoặc chạy quét lại sau khi đổi rule.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-[1080px] w-full text-left text-sm">
+              <thead className="bg-slate-100">
+                <tr>
+                  <th className="px-3 py-2">Bộ lọc</th>
+                  <th className="px-3 py-2">Hãng</th>
+                  <th className="px-3 py-2">Mã chuyến</th>
+                  <th className="px-3 py-2">Tuyến bay</th>
+                  <th className="px-3 py-2">Khởi hành</th>
+                  <th className="px-3 py-2">Đến nơi</th>
+                  <th className="px-3 py-2">Giá</th>
+                  <th className="px-3 py-2"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {deals.map((deal) => {
+                  const ruleTitle = rules.find((r) => r.id === deal.ruleId)?.title ?? deal.ruleId.slice(0, 8);
+                  return (
+                    <tr key={deal.id} className="border-b">
+                      <td className="px-3 py-2 font-medium text-slate-800">{ruleTitle}</td>
+                      <td className="px-3 py-2">{deal.airline.toUpperCase()}</td>
+                      <td className="px-3 py-2">{deal.flightNumber}</td>
+                      <td className="px-3 py-2">
+                        {getAirportLabel(deal.departureCode)} {"->"} {getAirportLabel(deal.arrivalCode)}
+                      </td>
+                      <td className="px-3 py-2">{formatDateTime(deal.departureTime)}</td>
+                      <td className="px-3 py-2">{formatDateTime(deal.arrivalTime)}</td>
+                      <td className="px-3 py-2">{formatPrice(deal.price, deal.currency)}</td>
+                      <td className="px-3 py-2">
+                        <a className="font-semibold text-blue-700" href={deal.deeplink} target="_blank" rel="noreferrer">
+                          Xem vé
+                        </a>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </div>
   );

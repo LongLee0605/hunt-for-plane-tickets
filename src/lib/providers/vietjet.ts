@@ -31,6 +31,7 @@ export const vietjetProvider: FlightProvider = {
       params.departureCode,
       params.arrivalCode,
       params.dateFrom,
+      params.dateTo,
     );
     return mapDeals(params, result.deals);
   },
