@@ -4,11 +4,11 @@ import {
   saveDeals,
   saveNotificationLogs,
   updateScanState,
-} from "@/lib/db";
-import { sendDealsEmail } from "@/lib/notifier";
-import { getProvider } from "@/lib/providers";
-import type { AlertRule, FlightDeal } from "@/lib/types";
-import { createId, nowIso } from "@/lib/utils";
+} from "./db";
+import { sendDealsEmail } from "./notifier";
+import { getProvider } from "./providers";
+import type { AlertRule, FlightDeal } from "./types";
+import { createId, nowIso } from "./utils";
 
 function pickMatchedDeals(rule: AlertRule, deals: FlightDeal[]) {
   return deals.filter((deal) => deal.price <= rule.maxPrice);

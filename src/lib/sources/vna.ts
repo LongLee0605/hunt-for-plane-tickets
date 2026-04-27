@@ -1,5 +1,5 @@
-import type { SourceResult } from "@/lib/sources/types";
-import { searchTravelpayoutsDeals } from "@/lib/travelpayouts";
+import type { SourceResult } from "./types";
+import { searchTravelpayoutsDeals } from "../travelpayouts";
 
 export async function fetchVnaSourceDeals(from: string, to: string, dateFrom: string): Promise<SourceResult> {
   const fromTravelpayouts = await searchTravelpayoutsDeals({

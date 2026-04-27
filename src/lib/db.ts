@@ -1,4 +1,4 @@
-import type { AlertRule, Airline, FlightDeal, NotificationLog, ScanState } from "@/lib/types";
+import type { AlertRule, Airline, FlightDeal, NotificationLog, ScanState } from "./types";
 
 type D1QueryResult<T = Record<string, unknown>> = {
   results?: T[];

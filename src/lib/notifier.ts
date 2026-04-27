@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
-import type { AlertRule, FlightDeal, NotificationLog } from "@/lib/types";
-import { createId, nowIso } from "@/lib/utils";
+import type { AlertRule, FlightDeal, NotificationLog } from "./types";
+import { createId, nowIso } from "./utils";
 
 function getTransporter() {
   const user = process.env.GMAIL_USER;

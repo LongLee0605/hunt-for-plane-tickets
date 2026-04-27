@@ -1,4 +1,4 @@
-import type { SourceDeal } from "@/lib/sources/types";
+import type { SourceDeal } from "./sources/types";
 
 type CheapPriceRecord = {
   value?: number;

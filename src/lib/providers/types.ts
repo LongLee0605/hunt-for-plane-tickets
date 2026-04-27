@@ -1,4 +1,4 @@
-import type { Airline } from "@/lib/types";
+import type { Airline } from "../types";
 
 export type SearchParams = {
   departureCode: string;

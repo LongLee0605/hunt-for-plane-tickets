@@ -1,0 +1,6 @@
+name = "hunt-for-plane-scan-trigger"
+main = "src/index.ts"
+compatibility_date = "2026-04-27"
+
+[triggers]
+crons = ["*/10 * * * *"]

@@ -1,5 +1,5 @@
-import type { FlightProvider, ProviderDeal, SearchParams } from "@/lib/providers/types";
-import { fetchVjSourceDeals } from "@/lib/sources/vj";
+import type { FlightProvider, ProviderDeal, SearchParams } from "./types";
+import { fetchVjSourceDeals } from "../sources/vj";
 
 type RemoteDeal = {
   flightNumber: string;

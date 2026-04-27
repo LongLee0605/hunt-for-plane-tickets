@@ -1,6 +1,6 @@
-import type { FlightProvider } from "@/lib/providers/types";
-import { vietnamAirlinesProvider } from "@/lib/providers/vietnamAirlines";
-import { vietjetProvider } from "@/lib/providers/vietjet";
+import type { FlightProvider } from "./types";
+import { vietnamAirlinesProvider } from "./vietnamAirlines";
+import { vietjetProvider } from "./vietjet";
 
 const registry: Record<string, FlightProvider> = {
   vietnamairlines: vietnamAirlinesProvider,
