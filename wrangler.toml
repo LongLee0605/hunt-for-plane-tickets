@@ -1,0 +1,7 @@
+name = "hunt-for-plane"
+compatibility_date = "2026-04-27"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hunt-for-plane"
+database_id = "10520127-e469-4ceb-bd1b-2c82079a9aed"

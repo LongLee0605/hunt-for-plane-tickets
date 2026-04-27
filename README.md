@@ -15,7 +15,7 @@ Ung dung web theo doi gia ve theo rule va gui canh bao qua Gmail.
 - `src/lib/providers/*`: adapter lay du lieu theo tung hang bay.
 - `src/lib/scanner.ts`: engine scan, match, notify.
 - `src/lib/notifier.ts`: gui email qua Gmail app password.
-- `data/store.json`: luu du lieu local cho MVP.
+- `src/lib/db.ts`: ket noi truc tiep Cloudflare D1 qua REST API.
 
 ## Cai dat
 
@@ -26,6 +26,12 @@ npm run dev
 ```
 
 Mo [http://localhost:3000](http://localhost:3000).
+
+## Khoi tao D1 schema
+
+```bash
+npx wrangler d1 execute hunt-for-plane --file migrations/0001_init.sql
+```
 
 ## Worker scan dinh ky
 
@@ -39,6 +45,9 @@ Mac dinh cron moi 10 phut (`SCAN_CRON=*/10 * * * *`).
 
 - `TRAVELPAYOUTS_BASE_URL`: API base URL cua Travelpayouts.
 - `TRAVELPAYOUTS_TOKEN`: token Data API (dang ky affiliate co the su dung voi tai khoan ca nhan).
+- `CLOUDFLARE_ACCOUNT_ID`: account id Cloudflare.
+- `CLOUDFLARE_API_TOKEN`: API token co quyen D1 edit.
+- `CLOUDFLARE_D1_DATABASE_ID`: ID cua D1 database.
 - `GMAIL_USER`: Gmail sender.
 - `GMAIL_APP_PASSWORD`: app password cua Gmail sender.
 - `NOTIFY_TO_EMAIL`: email nguoi nhan canh bao.
@@ -48,3 +57,10 @@ Mac dinh cron moi 10 phut (`SCAN_CRON=*/10 * * * *`).
 - He thong chi dung duy nhat Travelpayouts Data API.
 - KHONG dung crawl va KHONG dung du lieu mock fallback.
 - Chi gui canh bao khi co du lieu thuc tu API.
+
+## Cloudflare D1
+
+- Da tao san `wrangler.toml` voi:
+  - `name = "hunt-for-plane"`
+  - `database_name = "hunt-for-plane"`
+  - `database_id = "10520127-e469-4ceb-bd1b-2c82079a9aed"`
